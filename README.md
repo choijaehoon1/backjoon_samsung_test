@@ -3,7 +3,7 @@
 
 ### Algorithm
 ```
-[Algorithm_type] - 01.예제 1번.py
+[Algorithm_13460_bfs] - 01.구슬 탈출 2.py
 ```
 
 > 업데이트 중
