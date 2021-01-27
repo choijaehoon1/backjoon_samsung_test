@@ -5,6 +5,7 @@
 ```
 [Algorithm_13460_bfs] - 01.구슬 탈출 2.py
 [Algorithm_12100_dfs] - 02.2048(Easy).py
+[Algorithm_3190_bfs]  - 03.뱀.py
 ```
 
 > 업데이트 중
