@@ -8,6 +8,7 @@
 [Algorithm_3190_bfs]     - 03.뱀.py
 [Alogrithm_13458_greedy] - 04.시험 감독.py
 [Alogrithm_14500_brute]  - 05.테트로미노.py
+[Alogrithm_14501_dp]     - 06.퇴사.py
 ```
 
 > 업데이트 중
