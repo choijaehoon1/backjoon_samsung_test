@@ -11,6 +11,8 @@
 [Alogrithm_14501_dp]      - 06.퇴사.py
 [Algorithm_14502_dfs_bfs] - 07.연구소.py
 [Algorithm_14503_simul]   - 08.로봇 청소기.py
+[Algorithm_14888_dfs]     - 09.연산자 끼워넣기.py
+[Algorithm_14889_imple]   - 10.스타트와 링크.py
 ```
 
 > 업데이트 중
