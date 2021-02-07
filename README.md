@@ -17,6 +17,7 @@
 [Algorithm_14891_dfs]     - 12.톱니바퀴.py
 [Algorithm_15683_dfs_bfs] - 13.감시.py
 [Algorithm_15684_dfs]     - 14.사다리 조작.py
+[Algorithm_15685_simul]   - 15.드래곤 커브.py
 ```
 
 > 업데이트 중
