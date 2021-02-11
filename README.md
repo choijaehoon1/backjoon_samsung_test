@@ -18,6 +18,8 @@
 [Algorithm_15683_dfs_bfs] - 13.감시.py
 [Algorithm_15684_dfs]     - 14.사다리 조작.py
 [Algorithm_15685_simul]   - 15.드래곤 커브.py
+[Algorithm_15686_imple]   - 16.치킨 배달.py
+[Algorithm_5373_brute]    - 17.큐빙.py
 ```
 
 > 업데이트 중
