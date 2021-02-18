@@ -26,6 +26,7 @@
 [Algorithm_17144_bfs]     - 21.미세먼지 안녕!.py
 [Algorithm_17143_imple]   - 22.낚시왕.py
 [Algorithm_17140_imple]   - 23.이차원 배열과 연산.py
+[Algorithm_17142_bfs]     - 24.연구소 3.py
 ```
 
 > 업데이트 중
