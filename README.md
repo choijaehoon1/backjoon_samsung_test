@@ -28,6 +28,7 @@
 [Algorithm_17140_imple]   - 23.이차원 배열과 연산.py
 [Algorithm_17142_bfs]     - 24.연구소 3.py
 [Algorithm_17779_imple]   - 25.게리멘더링 2.py
+[Algorithm_17837_imple]   - 26.새로운 게임 2.py
 ```
 
 > 업데이트 중
