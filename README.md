@@ -30,6 +30,7 @@
 [Algorithm_17779_imple]   - 25.게리멘더링 2.py
 [Algorithm_17837_imple]   - 26.새로운 게임 2.py
 [Algorithm_17822_imple]   - 27.원판 돌리기.py
+[Algorithm_17825_dfs]     - 28.주사위 윷놀이.py
 ```
 
 > 업데이트 중
