@@ -33,6 +33,7 @@
 [Algorithm_17825_dfs]     - 28.주사위 윷놀이.py
 [Algorithm_20061_simul]   - 29.모노미노도미노 2.py
 [Algorithm_19236_dfs]     - 30.청소년 상어.py
+[Algorithm_19237_simul]   - 31.어른 상어.py
 ```
 
 > 업데이트 중
