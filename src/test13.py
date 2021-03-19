@@ -50,7 +50,10 @@ def dfs(board,cnt):
     for i in direction[num]: # 해당 cctv가 볼수 있는 방향탐색
         bfs(tmp_board,x,y,i) # tmp_board를 변화시키고
         dfs(tmp_board,cnt+1) # tmp_board로 dfs 수행
-        tmp_board = copy.deepcopy(board) # 같은 번호의 다른 방향check하기 위해 값바뀌기 전 board복사하여 갱신
+        # 같은 번호의 다른방향 check하기 위해 retrun함수 되돌아 올때 원복 필요
+        # dfs 수행하는 board를 복사하여 갱신
+        tmp_board = copy.deepcopy(board)
+
 
 dfs(board,0)
 print(answer)
