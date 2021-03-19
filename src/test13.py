@@ -9,7 +9,7 @@ for i in range(n):
         if board[i][j] != 0 and board[i][j] != 6:
             cctv_list.append((i,j,board[i][j]))
             cctv_cnt += 1
-# 북 서 남 동 (시계방향으로 지정)
+# 북 동 남 서 (시계방향으로 지정)
 dx = [-1,0,1,0]
 dy = [0,1,0,-1]            
 # 각각 이동할 수 있는 방향리스트 선언(북:0이라 가정)      
