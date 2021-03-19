@@ -10,8 +10,8 @@ def spread(x,y,num):
 
 def clean(x,y,dirs):
     tmp = copy.deepcopy(new_board) # board상태를 tmp에 저장
-    cx,cy = x,y-1 # 종료조건(넘길때 +1 해서 넘겼으므로 조정)
-    new_board[x][y] = 0 # y좌표 +1의 값은 0으로 설정
+    cx,cy = x,y-1 # 종료조건(넘길때 +1 해서 넘겼으므로 조정), 공기청정기의 위치임
+    new_board[x][y] = 0 # y좌표 +1의 값은 0으로 설정(현재 수행하는 좌표는 공기청정기 바로 다음이므로 0)
     for k in range(4): # 4방향 수행
         while True:
             nx = x + dx[dirs[k]]
@@ -55,6 +55,7 @@ for _ in range(t):
         cnt = spread(x,y,num) # 퍼진 방향만큼 빼주는 용도
         new_board[x][y] -= (cnt*num)
     # print(new_board)
+    # 공기청정기 작동하므로 y좌표 한칸 아동한 곳부터 체크하는 것이므로 +1 
     clean(clear[0][0],clear[0][1]+1,[3,0,2,1]) # 시계반대방향
     clean(clear[1][0],clear[1][1]+1,[3,1,2,0]) # 시계방향
     # print(new_board)    
