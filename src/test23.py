@@ -1,53 +1,48 @@
-from collections import Counter
-import copy
+import sys
 
-def process():
-    max_len = 0 
-    row = len(board)
-    for i in range(row): # 각 행에 대해
-        check = [j for j in board[i] if j != 0] # 0은 카운트 제외
-        check_list = Counter(check).most_common()
-        check_list.sort(key=lambda x:(x[1],x[0])) # 주어진 조건대로 정렬
-        board[i] = [] # 각 행의 원소넣는 리스트
-        for num,cnt in check_list:
-            board[i].append(num)
-            board[i].append(cnt)
+def move():
+    tmp = [[0]*C for _ in range(R)] # 바뀐 board 리턴용
+    for i in range(R):
+        for j in range(C):
+            if board[i][j] != 0: # 이전 보드의 상어가 있으면
+                x,y,s,d,z = i,j,board[i][j][0],board[i][j][1],board[i][j][2]
+                while s>0: # 속도만큼 이동
+                    x += dx[d] 
+                    y += dy[d]
+                    if 0<=x<R and 0<=y<C: # 범위안에 있는 경우
+                        s-=1
+                    else: # 범위 벗어난 경우
+                        # 위에 증가시켜준 값을 감소시킴
+                        x -= dx[d] 
+                        y -= dy[d]    
+                        # 방향 바꿔주기
+                        if d == 0 or d == 2: 
+                            d = d+1
+                        elif d == 1 or d == 3:
+                            d = d-1                            
+                if tmp[x][y] == 0: # 최종으로 이동한 좌표가 빈칸이면
+                    tmp[x][y] = [board[i][j][0],d,z] # 갱신
+                else: # 이동한 좌표의 다른 상어가 있는 경우
+                    if tmp[x][y][2] < z: # 원래 저장된 상어의 크기보다 지금 이동한 상어가 더 크기가 큰 경우
+                        tmp[x][y] = [board[i][j][0],d,z] # 현재 상어로 갱신시킴
+    return tmp                        
 
-        c_len = len(check_list) # 현재 길이(c_len은 2가지 원소가 있는 튜플형태가 하나로 취급되므로 최대길이는 *2)
-        if max_len < c_len*2: # 최대길이 갱신
-            max_len = c_len*2
-    for i in range(row):
-        for j in range(max_len-len(board[i])): # 각행이 최대길이 보다 짧은 경우 0 추가
-            board[i].append(0)
-        board[i] = board[i][:100] # 100보다 길어지면 자르기
+R,C,m = map(int,sys.stdin.readline().rstrip().split())
 
-r,c,k = map(int,input().split())
-board = []
-for i in range(3):
-    board.append(list(map(int,input().split())))
+board = [[0]*C for _ in range(R)]
+for i in range(m):
+    r,c,s,d,z = map(int,input().split())
+    board[r-1][c-1] = [s,d-1,z] # 속도,방향,크기 저장
 
-time = 0
-while True:
-    if time > 100:
-        print(-1)
-        break
-    try:
-        if board[r-1][c-1] == k:
-            print(time)
-            break
-    except:
-        pass
-    row = len(board)        
-    column = len(board[0])
-    if row < column: # C연산
-        # 2차원배열인 board에 *로 언패킹하고 zip연산을 통해 
-        # 각 행의 첫번째원소들, 두번째원소들 ... 묶어서 -> 리스트 형태로 변환
-        # 즉 2차원리스트 회전
-        board = list(zip(*board)) # 열이 행이 됨 (트랜스포즈)
-        process() # 행처럼 처리
-        board = list(zip(*board)) # 행처럼 처리했으므로 다시 원래형태로 만들어야 함  (트랜스포즈)
-    else: # R연산
-        process() # 행처리        
+dx = [-1,1,0,0]
+dy = [0,0,1,-1]
 
-    time += 1        
-
+answer = 0
+for j in range(C):
+    for i in range(R):
+        if board[i][j] != 0: # 상어가 있으면
+            answer += board[i][j][2] # 상어잡고
+            board[i][j] = 0 # 빈칸만들기
+            break # 하나만 잡기
+    board = move() # 이동한 값으로 board 갱신   
+print(answer)

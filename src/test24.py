@@ -1,66 +1,53 @@
-from collections import deque
-from itertools import combinations
-import sys
+from collections import Counter
+import copy
 
-def bfs():
-    while q:
-        x,y = q.popleft()
-        for k in range(4):
-            nx = x + dx[k]
-            ny = y + dy[k]
-            if 0<=nx<n and 0<=ny<n:
-                # 방문하지 않았고 벽이 아닌 경우
-                if visit[nx][ny] == 0 and board[nx][ny] != 1:
-                    visit[nx][ny] = 1
-                    dist[nx][ny] = dist[x][y]+1
-                    q.append([nx,ny])
+def process():
+    max_len = 0 
+    row = len(board)
+    for i in range(row): # 각 행에 대해
+        check = [j for j in board[i] if j != 0] # 0은 카운트 제외
+        check_list = Counter(check).most_common()
+        check_list.sort(key=lambda x:(x[1],x[0])) # 주어진 조건대로 정렬
+        board[i] = [] # 각 행의 원소넣는 리스트
+        for num,cnt in check_list:
+            board[i].append(num)
+            board[i].append(cnt)
 
-n,m = map(int,sys.stdin.readline().rstrip().split())
+        c_len = len(check_list) # 현재 길이(c_len은 2가지 원소가 있는 튜플형태가 하나로 취급되므로 최대길이는 *2)
+        if max_len < c_len*2: # 최대길이 갱신
+            max_len = c_len*2
+    for i in range(row):
+        for j in range(max_len-len(board[i])): # 각행이 최대길이 보다 짧은 경우 0 추가
+            board[i].append(0)
+        board[i] = board[i][:100] # 100보다 길어지면 자르기
+
+r,c,k = map(int,input().split())
 board = []
-for i in range(n):
-    board.append(list(map(int,sys.stdin.readline().rstrip().split())))
+for i in range(3):
+    board.append(list(map(int,input().split())))
 
-dx = [-1,1,0,0]
-dy = [0,0,-1,1]    
+time = 0
+while True:
+    if time > 100:
+        print(-1)
+        break
+    try:
+        if board[r-1][c-1] == k:
+            print(time)
+            break
+    except:
+        pass
+    row = len(board)        
+    column = len(board[0])
+    if row < column: # C연산
+        # 2차원배열인 board에 *로 언패킹하고 zip연산을 통해 
+        # 각 행의 첫번째원소들, 두번째원소들 ... 묶어서 -> 리스트 형태로 변환
+        # 즉 2차원리스트 회전
+        board = list(zip(*board)) # 열이 행이 됨 (트랜스포즈)
+        process() # 행처럼 처리
+        board = list(zip(*board)) # 행처럼 처리했으므로 다시 원래형태로 만들어야 함  (트랜스포즈)
+    else: # R연산
+        process() # 행처리        
 
-INF = int(1e9)
-virus = []
-check = 0 # 바이러스가 활성화될 칸의 개수
-for i in range(n):
-    for j in range(n):
-        if board[i][j] == 2:
-            virus.append([i,j]) # 튜플형태로 넣을 때에는 주의 필요           
-        if board[i][j] != 1:
-            check += 1
-        
-answer = INF
-for combi in combinations(virus,m):
-    # 동시에 퍼져나가게 하기위해 q에 바이러스 정보를 넣고 bfs 수행
-    # 최단거리 테이블도 만들어 같이 수행
-    q = deque()
-    dist = [[-1]*n for _ in range(n)]
-    visit = [[0]*n for _ in range(n)]
-    for x,y in combi:
-        q.append([x,y])
-        dist[x][y] = 0
-        visit[x][y] = 1
-    bfs()        
-    # 방문한 칸 카운팅
-    cnt = 0
-    for i in range(n):
-        for j in range(n):
-            if visit[i][j] == 1:
-                cnt += 1
-    # 바이러스를 확산시킬 수 있는 경우          
-    if cnt == check:
-        max_num = 0 # 주의 -INF로 하지 말것
-        for j in range(n):
-            for k in range(n):
-                if board[j][k] != 1 and [j,k] not in virus: # 벽이아닌 칸이고 바이러스 시작칸이 아닌 경우 check
-                    max_num = max(max_num,dist[j][k]) # 가장 마지막 확산시칸 저장
-        answer = min(answer,max_num) # combinations 중 가장 작은 값 저장
+    time += 1        
 
-if answer == INF: 
-    print(-1)
-else:
-    print(answer)    

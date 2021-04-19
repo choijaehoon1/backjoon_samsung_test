@@ -1,48 +1,69 @@
+def spread(x,y,num):
+    cnt = 0
+    for k in range(4):
+        nx = x + dx[k]
+        ny = y + dy[k]
+        if 0<=nx<r and 0<=ny<c and new_board[nx][ny] != -1:
+            cnt += 1
+            new_board[nx][ny] += num
+    return cnt         
+
+def clean(x,y,dirs):
+    tmp = copy.deepcopy(new_board) # board상태를 tmp에 저장
+    cx,cy = x,y-1 # 종료조건(넘길때 +1 해서 넘겼으므로 조정), 공기청정기의 위치임
+    new_board[x][y] = 0 # y좌표 +1의 값은 0으로 설정(현재 수행하는 좌표는 공기청정기 바로 다음이므로 0)
+    for k in range(4): # 4방향 수행
+        while True:
+            nx = x + dx[dirs[k]]
+            ny = y + dy[dirs[k]]
+            if nx == cx and ny == cy: # 종료
+                return
+            if 0<=nx<r and 0<=ny<c: # 범위안에 있으면 값 갱신
+                new_board[nx][ny] = tmp[x][y]
+            else: # 범위벗어나면 다른 방향으로 수행
+                break
+            x,y = nx,ny # 좌표 갱신
+
+from collections import deque
+import copy
 import sys
+r,c,t = map(int,sys.stdin.readline().rstrip().split())
 
-def move():
-    tmp = [[0]*C for _ in range(R)] # 바뀐 board 리턴용
-    for i in range(R):
-        for j in range(C):
-            if board[i][j] != 0: # 이전 보드의 상어가 있으면
-                x,y,s,d,z = i,j,board[i][j][0],board[i][j][1],board[i][j][2]
-                while s>0: # 속도만큼 이동
-                    x += dx[d] 
-                    y += dy[d]
-                    if 0<=x<R and 0<=y<C: # 범위안에 있는 경우
-                        s-=1
-                    else: # 범위 벗어난 경우
-                        # 위에 증가시켜준 값을 감소시킴
-                        x -= dx[d] 
-                        y -= dy[d]    
-                        # 방향 바꿔주기
-                        if d == 0 or d == 2: 
-                            d = d+1
-                        elif d == 1 or d == 3:
-                            d = d-1                            
-                if tmp[x][y] == 0: # 최종으로 이동한 좌표가 빈칸이면
-                    tmp[x][y] = [board[i][j][0],d,z] # 갱신
-                else: # 이동한 좌표의 다른 상어가 있는 경우
-                    if tmp[x][y][2] < z: # 원래 저장된 상어의 크기보다 지금 이동한 상어가 더 크기가 큰 경우
-                        tmp[x][y] = [board[i][j][0],d,z] # 현재 상어로 갱신시킴
-    return tmp                        
-
-R,C,m = map(int,sys.stdin.readline().rstrip().split())
-
-board = [[0]*C for _ in range(R)]
-for i in range(m):
-    r,c,s,d,z = map(int,input().split())
-    board[r-1][c-1] = [s,d-1,z] # 속도,방향,크기 저장
+board = []
+for i in range(r):
+    board.append(list(map(int,sys.stdin.readline().rstrip().split())))
 
 dx = [-1,1,0,0]
-dy = [0,0,1,-1]
+dy = [0,0,-1,1]
 
+for _ in range(t):
+    new_board = [[0]*c for _ in range(r)] 
+    dust = deque()
+    clear = deque()
+    for i in range(r):
+        for j in range(c):
+            if board[i][j] == -1:
+                clear.append((i,j))
+                new_board[i][j] = board[i][j]
+            if board[i][j] != -1 and board[i][j] != 0:
+                dust.append((i,j))
+                new_board[i][j] = board[i][j]
+    # 확산시키기
+    for _ in range(len(dust)):
+        x,y = dust.popleft()
+        num = board[x][y]//5 
+        cnt = spread(x,y,num) # 퍼진 방향만큼 빼주는 용도
+        new_board[x][y] -= (cnt*num)
+    # print(new_board)
+    # 공기청정기 작동하므로 y좌표 한칸 아동한 곳부터 체크하는 것이므로 +1 
+    clean(clear[0][0],clear[0][1]+1,[3,0,2,1]) # 시계반대방향
+    clean(clear[1][0],clear[1][1]+1,[3,1,2,0]) # 시계방향
+    # print(new_board)    
+
+    board = copy.deepcopy(new_board) # 갱신
+    
 answer = 0
-for j in range(C):
-    for i in range(R):
-        if board[i][j] != 0: # 상어가 있으면
-            answer += board[i][j][2] # 상어잡고
-            board[i][j] = 0 # 빈칸만들기
-            break # 하나만 잡기
-    board = move() # 이동한 값으로 board 갱신   
-print(answer)
+for i in range(r):
+    answer += sum(board[i]) 
+print(answer+2) # -1포함되어있으므로 2 증가   
+

@@ -1,69 +1,54 @@
-def spread(x,y,num):
-    cnt = 0
-    for k in range(4):
-        nx = x + dx[k]
-        ny = y + dy[k]
-        if 0<=nx<r and 0<=ny<c and new_board[nx][ny] != -1:
-            cnt += 1
-            new_board[nx][ny] += num
-    return cnt         
-
-def clean(x,y,dirs):
-    tmp = copy.deepcopy(new_board) # board상태를 tmp에 저장
-    cx,cy = x,y-1 # 종료조건(넘길때 +1 해서 넘겼으므로 조정), 공기청정기의 위치임
-    new_board[x][y] = 0 # y좌표 +1의 값은 0으로 설정(현재 수행하는 좌표는 공기청정기 바로 다음이므로 0)
-    for k in range(4): # 4방향 수행
-        while True:
-            nx = x + dx[dirs[k]]
-            ny = y + dy[dirs[k]]
-            if nx == cx and ny == cy: # 종료
-                return
-            if 0<=nx<r and 0<=ny<c: # 범위안에 있으면 값 갱신
-                new_board[nx][ny] = tmp[x][y]
-            else: # 범위벗어나면 다른 방향으로 수행
-                break
-            x,y = nx,ny # 좌표 갱신
-
 from collections import deque
-import copy
-import sys
-r,c,t = map(int,sys.stdin.readline().rstrip().split())
-
+n = int(input())
 board = []
-for i in range(r):
-    board.append(list(map(int,sys.stdin.readline().rstrip().split())))
+for i in range(n):
+    board.append(list(map(int,input().split())))
+    for j in range(n):
+        if board[i][j] == 9:
+            start_x,start_y = i,j
+            board[i][j] = 0
 
+# 먹을 수 있는 물고기 찾고 최단거리도 구해서 리턴
+def check(x,y):
+    q = deque()
+    visit[x][y] = 1
+    q.append([x,y])
+    check_list = []
+    dist = [[-1]*n for _ in range(n)]
+    dist[x][y] = 0
+
+    while q:
+        x,y = q.popleft()
+        for k in range(4):
+            nx = x +dx[k]
+            ny = y +dy[k]
+            if 0<=nx<n and 0<=ny<n and visit[nx][ny] == 0:
+                if board[nx][ny] <= start_size or board[nx][ny] == 0:
+                    visit[nx][ny] = 1
+                    dist[nx][ny] = dist[x][y] + 1
+                    q.append([nx,ny])
+                if board[nx][ny] < start_size and board[nx][ny] != 0:
+                    check_list.append([nx,ny,dist[nx][ny]])
+    check_list.sort(key=lambda x:(x[2],x[0],x[1])) # 최단거리 가장 짧은거 찾고 그중 제일위,제일왼쪽순 정렬       
+    return check_list
+answer = 0
+ate = 0
+start_size = 2
 dx = [-1,1,0,0]
 dy = [0,0,-1,1]
+while True:
+    visit = [[0]*n for _ in range(n)]
+    result = check(start_x,start_y)
+    if result == []:
+        print(answer)
+        break
+   
+    x,y,min_value = result[0]
+    answer += min_value    
+    start_x,start_y = x,y
+    board[x][y] = 0   
+    ate += 1
 
-for _ in range(t):
-    new_board = [[0]*c for _ in range(r)] 
-    dust = deque()
-    clear = deque()
-    for i in range(r):
-        for j in range(c):
-            if board[i][j] == -1:
-                clear.append((i,j))
-                new_board[i][j] = board[i][j]
-            if board[i][j] != -1 and board[i][j] != 0:
-                dust.append((i,j))
-                new_board[i][j] = board[i][j]
-    # 확산시키기
-    for _ in range(len(dust)):
-        x,y = dust.popleft()
-        num = board[x][y]//5 
-        cnt = spread(x,y,num) # 퍼진 방향만큼 빼주는 용도
-        new_board[x][y] -= (cnt*num)
-    # print(new_board)
-    # 공기청정기 작동하므로 y좌표 한칸 아동한 곳부터 체크하는 것이므로 +1 
-    clean(clear[0][0],clear[0][1]+1,[3,0,2,1]) # 시계반대방향
-    clean(clear[1][0],clear[1][1]+1,[3,1,2,0]) # 시계방향
-    # print(new_board)    
-
-    board = copy.deepcopy(new_board) # 갱신
-    
-answer = 0
-for i in range(r):
-    answer += sum(board[i]) 
-print(answer+2) # -1포함되어있으므로 2 증가   
-
+    if ate >= start_size:
+        ate = 0        
+        start_size += 1

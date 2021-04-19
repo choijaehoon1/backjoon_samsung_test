@@ -1,43 +1,47 @@
 import sys
-n = int(sys.stdin.readline().rstrip())
-data = list(map(int,sys.stdin.readline().rstrip().split()))
-add,sub,mal,div = map(int,sys.stdin.readline().rstrip().split())
+n,m = map(int,input().split())
+r,c,d = map(int,input().split())
+board = []
+for i in range(n):
+    board.append(list(map(int,input().split())))
 
-min_value = int(1e9)
-max_value = -int(1e9)
-def dfs(num,cnt):
-    # min_value,max_value는 그때 그떄 dfs에 따라 최대 최소 값을 지정하기 위해 global 키워드 필요
-    # add,sub,mal,div 역시 
-    # 파이썬은 전역변수를 읽을 수는 있지만 수정하기 위해서는 global키워드 필요
-    # list는 mutable, 튜플,숫자, 문자열 등의 변수도 모두 immutable
-    # 따라서 일반적인 dfs문제에서 전역보드를 값 변경하는데 global키워드 필요없으나
-    # 변수 같은 immutable은 global키워드 필요함
-    global add,sub,mal,div,min_value,max_value
-    if cnt == n:
-        max_value = max(max_value,num)
-        min_value = min(min_value,num)
-        return
+# 북,동,남,서
+dx = [-1,0,1,0]
+dy = [0,1,0,-1]
 
-    if add > 0:
-        add -= 1
-        dfs(num+data[cnt] ,cnt+1)
-        add += 1
+def turn_left(direction):
+    return (direction -1) % 4
 
-    if sub > 0:
-        sub -= 1
-        dfs(num-data[cnt] ,cnt+1)
-        sub += 1
+def get_sum():
+    cnt = 0
+    for i in range(n):
+        for j in range(m):
+            if board[i][j] == 2:
+                cnt +=1
+    return cnt                
 
-    if mal > 0:
-        mal -= 1
-        dfs(num*data[cnt] ,cnt+1)
-        mal += 1
+def move(x,y,direction,turn_count):
+    while True:
+        if turn_count == 4: # 4방향 다 검새 했으면 1칸후진해서 확인
+            back_x = x - dx[direction]
+            back_y = y - dy[direction]
+            if board[back_x][back_y] == 1: # 벽이면 종료
+                print(get_sum())
+                return
+            else: # 벽이 아니면 해당 좌표로 다시 수행
+                x,y,direction,turn_count = back_x,back_y,direction,0    
+        # 현재 위치 청소
+        if board[x][y] == 0:
+            board[x][y] = 2
+        
+        # 왼쪽으로 회전(주어진 조건이 왼쪽방향부터 차례대로 검사한다고 주어짐)
+        new_direction = turn_left(direction)
+        nx = x + dx[new_direction] # 왼쪽 회전 후 x좌표
+        ny = y + dy[new_direction] # 왼쪽 회전 후 y좌표
 
-    if div > 0:
-        div -= 1
-        dfs(int(num/data[cnt]),cnt+1)
-        div += 1        
+        if board[nx][ny] == 0: # 이동할 위치가 아직 청소안된 경우
+            x,y,direction,turn_count = nx,ny,new_direction,0
+        else: # 이미 청소했거나 벽인 경우(값이 2이거나 1) 좌표변경안하고 회전 count만 증가
+            x,y,direction,turn_count = x,y,new_direction,turn_count + 1                        
 
-dfs(data[0],1)
-print(max_value)
-print(min_value)
+move(r,c,d,0)

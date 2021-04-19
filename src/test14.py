@@ -1,56 +1,59 @@
-import sys
-n,m,h = map(int,sys.stdin.readline().rstrip().split())
+import copy
+n,m = map(int,input().split())
+board = []
+cctv_list = []
+cctv_cnt = 0
+for i in range(n):
+    board.append(list(map(int,input().split())))
+    for j in range(m):
+        if board[i][j] != 0 and board[i][j] != 6:
+            cctv_list.append((i,j,board[i][j]))
+            cctv_cnt += 1
+# 북 동 남 서 (시계방향으로 지정)
+dx = [-1,0,1,0]
+dy = [0,1,0,-1]            
+# 각각 이동할 수 있는 방향리스트 선언(북:0이라 가정)      
+direction = [[],[[0],[1],[2],[3]], [[3,1],[0,2]],[[0,1],[1,2],[2,3],[3,0]],[[3,0,1],[0,1,2],[1,2,3],[2,3,0]],[[0,1,2,3]]]
+answer = int(1e9)
 
-INF = int(1e9)
-# h가 가로선마다 놓을 수 있는 개수이므로 행을 h로 잡음
-board = [[0]*(n+1) for _ in range(h+1)]
-for i in range(m):
-    a,b = map(int,sys.stdin.readline().rstrip().split())
-    board[a][b] = 1 # b와 b+1 세로선연결하는 행은 a
+def bfs(board,x,y,direction): # tmp_board의 값이 바뀌는 것임
+    for i in direction: # 각각의 방향마다 check
+        nx,ny = x,y # nx,ny는 각각의 방향마다 bfs수행할때 넘어온 x,y로 갱신해줘야 함
+        while True:
+            nx += dx[i]
+            ny += dy[i]
+            if 0<=nx<n and 0<=ny<m:
+                if board[nx][ny] == 6:
+                    break
+                elif board[nx][ny] == 0:
+                    board[nx][ny] = "#"
+            else:
+                break
 
-def check():
-    # 현재 열에 대해 수행했을때 마지막에 도착한 열이 같은지 확인
-    for i in range(1,n+1):
-        tmp = i
-        for j in range(1,h+1):
-            if board[j][tmp] == 1:
-                tmp += 1
-            elif board[j][tmp-1] == 1:
-                tmp -= 1    
-        if i != tmp:
-            return False
-    return True
+def get_sum(board):
+    cnt = 0
+    for i in range(n):
+        for j in range(m):
+            if board[i][j] == 0:
+                cnt+=1
+    return cnt
 
-def dfs(latter_cnt,current_cnt):
-    global result
-    if result != INF: # result 값이 바뀌엇으면 리턴
+def dfs(board,cnt):
+    global answer
+    # cctv 검사 다하면 최소값 갱신
+    if cnt == cctv_cnt:
+        answer = min(answer, get_sum(board))
         return
-    if latter_cnt == current_cnt: # 현재 새로운 사다리 세웠을때 확인
-        if check(): # check가 True인 경우만 값변화
-            result = current_cnt
-        return # 리턴은 check가 false여도 해줘야하므로 여기서 리턴
 
-    for j in range(1,n): # 열에 대해서 확인
-        for i in range(1,h+1): # 행에 대해서 확인
-            # 양옆에 연결 안되어있고 현재 값도 0일때 사다리 세워보기
-            if board[i][j-1] == 0 and board[i][j+1] == 0 and board[i][j] == 0: 
-                board[i][j] = 1
-                dfs(latter_cnt,current_cnt+1)
-                board[i][j] = 0 # 복구
-                # 행의 양옆중 하나가 연결되어 있으면 바로 그다음 경우 확인하로 break하나 
-                # 그렇지 않다면 행을 증가시켜 확인 후 이동할수 있는 행을 찾는 과정
-                while i<h: 
-                    if board[i][j-1] == 1 or board[i][j+1] == 1:
-                        break
-                    i+=1
+    tmp_board = copy.deepcopy(board) # dfs타고 들어온 board 복사해서 사용
+    x,y,num = cctv_list[cnt]
+    for i in direction[num]: # 해당 cctv가 볼수 있는 방향탐색
+        bfs(tmp_board,x,y,i) # tmp_board를 변화시키고
+        dfs(tmp_board,cnt+1) # tmp_board로 dfs 수행
+        # 같은 번호의 다른방향 check하기 위해 retrun함수 되돌아 올때 원복 필요
+        # dfs 수행하는 board를 복사하여 갱신
+        tmp_board = copy.deepcopy(board)
 
-result = INF 
-for i in range(4): # 완전탐색(0개,1개,2개,3개) 높을 수 있으므로 각각 dfs 수행
-    dfs(i,0) # 다리놓는개수, 현재 개수
-    if result != INF: # result값이 바뀌었다는 건 check() 함수 True여서 값변화된 것이므로 가능한 경우임
-        print(result)
-        break
-# 끝까지 수행했는데 result 변화없으면 불가능한 경우
-if result == INF:
-    print(-1)    
-    
+
+dfs(board,0)
+print(answer)

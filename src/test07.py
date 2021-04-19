@@ -1,57 +1,14 @@
-from collections import deque
-n,m = map(int, input().split())
-board = []
+n = int(input())
+dp = [0 for _ in range(n+1)] 
+
+data = []
 for i in range(n):
-    board.append(list(map(int, input().split())))
-# bfs하기 위한 용도의 전역 보드
-tmp_board = [[0]*m for _ in range(n)]
-dx = [-1,1,0,0]
-dy = [0,0,-1,1]
+    data.append(list(map(int,input().split())))
 
-def bfs(x,y):
-    q = deque()
-    q.append([x,y])    
-    while q:
-        x,y = q.popleft()
-        for k in range(4):
-            nx = x + dx[k]
-            ny = y + dy[k]
-            if 0<=nx<n and 0<=ny<m and tmp_board[nx][ny] == 0:
-                tmp_board[nx][ny] = 2
-                q.append([nx,ny])
-
-def get_score(array):
-    answer = 0
-    for i in range(n):
-        for j in range(m):
-            if array[i][j] == 0:
-                answer += 1
-    return answer                
-
-def dfs(cnt):
-    global result
-    if cnt == 3:
-        # bfs해서 구하기 위해 tmp_board 사용, 이전 보드 그대로 사용시 dfs할때 문제생기므로
-        for i in range(n):
-            for j in range(m):
-                tmp_board[i][j] = board[i][j]
-
-        for i in range(n):
-            for j in range(m):
-                if tmp_board[i][j] == 2:
-                    bfs(i,j)
-        answer = get_score(tmp_board)
-        result = max(result,answer)
-        return
-
-    for i in range(n):
-        for j in range(m):
-            if board[i][j] == 0: # 전역보드
-                board[i][j] = 1
-                cnt += 1
-                dfs(cnt)
-                cnt -= 1
-                board[i][j] = 0
-result = 0
-dfs(0)
-print(result)
+for i in range(len(data)-1,-1,-1): # data의 인덱스는 0~6임
+    time = i + data[i][0] # 현재 수행하는 시간
+    if time < n+1: # 시간안에 가능한 경우
+        dp[i] = max(dp[time] + data[i][1],dp[i+1]) # 그때 시간의 dp + 금액과 이미 구해졌던 dp 중 최대값
+    else: # 범위벗어나면 뒤에 값 복사
+        dp[i] = dp[i+1]        
+print(dp[0]) # 제일 앞의 값 출력

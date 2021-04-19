@@ -1,14 +1,40 @@
-n = int(input())
-dp = [0 for _ in range(n+1)] 
+tetromino = [
+    [(0,0),(0,1),(0,2),(0,3)],[(0,0),(1,0),(2,0),(3,0)], # -모형은 2가지 경우
+    [(0,0),(0,1),(1,0),(1,1)], # 사각형은 1가지 경우
+    # ㄴ모양은 8가지 경우(90도 회전하면서 확인 and 좌우대칭 확인)
+    [(0,0),(1,0),(2,0),(2,1)],[(0,1),(1,1),(2,1),(2,0)],
+    [(0,0),(1,0),(0,1),(0,2)],[(0,0),(0,1),(0,2),(1,2)],
+    [(0,0),(0,1),(1,1),(2,1)],[(0,0),(0,1),(1,0),(2,0)],
+    [(1,0),(1,1),(1,2),(0,2)],[(0,0),(1,0),(1,1),(1,2)],
+    # ㄹ모양은 4가지 경우
+    [(0,0),(1,0),(1,1),(2,1)],[(0,1),(1,1),(1,0),(2,0)],
+    [(0,0),(0,1),(1,1),(1,2)],[(1,0),(1,1),(0,1),(0,2)],
+    # ㅗ모양은 4가지 경우
+    [(0,0),(0,1),(0,2),(1,1)],[(0,1),(1,0),(1,1),(1,2)],
+    [(0,0),(1,0),(2,0),(1,1)],[(0,1),(1,1),(2,1),(1,0)],    
+]
 
-data = []
+def find(x,y):
+    global result
+    for i in range(19):
+        tmp = 0
+        for j in range(4):
+            nx = x + tetromino[i][j][0]
+            ny = y + tetromino[i][j][1]
+            if 0 <= nx < n and 0 <= ny <m:
+                tmp += board[nx][ny]
+            else: # 범위 벗어나는 경우는 무시
+                continue                
+        result = max(result,tmp)            
+
+n,m = map(int, input().split())
+
+board = []
 for i in range(n):
-    data.append(list(map(int,input().split())))
+    board.append(list(map(int, input().split())))
 
-for i in range(len(data)-1,-1,-1): # data의 인덱스는 0~6임
-    time = i + data[i][0] # 현재 수행하는 시간
-    if time < n+1: # 시간안에 가능한 경우
-        dp[i] = max(dp[time] + data[i][1],dp[i+1]) # 그때 시간의 dp + 금액과 이미 구해졌던 dp 중 최대값
-    else: # 범위벗어나면 뒤에 값 복사
-        dp[i] = dp[i+1]        
-print(dp[0]) # 제일 앞의 값 출력
+result = 0
+for i in range(n):
+    for j in range(m):
+        find(i,j)
+print(result)        
