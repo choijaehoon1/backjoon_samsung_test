@@ -38,6 +38,7 @@
 [Algorithm_19238_simul]   - 33.스마트 택시.py
 [Algorithm_20055_simul]   - 34.컨베이어 벨트 위의 로봇.py
 [Algorithm_20056_simul]   - 35.마법사 상어와 파이어볼.py
+[Algorithm_20057_simul]   - 36.마법사 상어와 토네이도.py
 ```
 
 > 업데이트 중
